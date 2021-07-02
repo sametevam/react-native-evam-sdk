@@ -1,3 +1,3 @@
-declare module 'react-native-event-sdk' {
+declare module 'react-native-evam-sdk' {
   export const start: string
 }
