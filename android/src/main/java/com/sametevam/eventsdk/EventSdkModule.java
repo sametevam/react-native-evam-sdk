@@ -1,4 +1,4 @@
-package com.sametevam.eventsdk;
+package com.sametevam.evamsdk;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -12,14 +12,14 @@ import android.content.pm.PackageManager;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EventSdkModule extends ReactContextBaseJavaModule {
+public class EvamSdkModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
 
   private static final String START = "start";
  
 
-  public EventSdkModule(ReactApplicationContext reactContext) {
+  public EvamSdkModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
   }
