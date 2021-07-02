@@ -7,4 +7,4 @@ type EvamSdkObject = {
 const start: EvamSdkObject = {
 };
 
-export default EventSdk;
+export default EvamSdk;
