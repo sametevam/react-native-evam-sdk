@@ -24,17 +24,10 @@ public class RNEvamSdkModule extends ReactContextBaseJavaModule {
     this.reactContext = reactContext;
   }
 
-  @Override
-  public String getName() {
-    return "RNEvamSdk";
-  }
-
-   @Override
-  public Map<String, Object> getConstants() {
-    final Map<String, Object> constants = new HashMap<>();
-
-    // try {
-       com.evam.evamsdk.Evam evamInstance = com.evam.evamsdk.Evam.Companion.getInstance();
+  @ReactMethod
+    public String getEvamFunc() { 
+    
+      com.evam.evamsdk.Evam evamInstance = com.evam.evamsdk.Evam.Companion.getInstance();
         Application thisApplication = getApplication();
         evamInstance.initialize(
                 thisApplication,
@@ -46,9 +39,37 @@ public class RNEvamSdkModule extends ReactContextBaseJavaModule {
                 "evam.com",
                 false
         );
+    
+      return "heyyyyy"; 
+  }
+
+  @Override
+  public String getName() {
+    return "RNEvamSdk";
+  }
+
+   @Override
+  public Map<String, Object> getConstants() {
+    final Map<String, Object> constants = new HashMap<>();
+    
+
+    // try {
+      //  com.evam.evamsdk.Evam evamInstance = com.evam.evamsdk.Evam.Companion.getInstance();
+      //   Application thisApplication = getApplication();
+      //   evamInstance.initialize(
+      //           thisApplication,
+      //         "https://test.em.api-evam.com/sdk-api/in-app-communication-wrapper",
+      //           "https://test.em.api-evam.com/sdk-listener/event",
+      //           "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJldmFtIiwiZG9tYWluIjoiZXZhbS5jb20iLCJpYXQiOjE2MTQyODYyODZ9.sfhJmjaYjeVMFSdR7nJxg1SndWHqdJY0HgdICmnpBgg",
+      //           "evam.com",
+      //           "evam",
+      //           "evam.com",
+      //           false
+      //   );
         // evamInstance.setSplashActivity(MainActivity.class);
 
-        constants.put(START, "May the force be with you");
+        // constants.put(START, "May the force be with you");
+        constants.put(START, getEvamFunc());
     // } catch (NameNotFoundException e) {
       // e.printStackTrace();
       //  System.out.println("Message: " + e.getMessage());
