@@ -1,4 +1,4 @@
-package com.apsl.versionnumber;
+package com.sametevam.evamsdk;
 
 import java.util.Arrays;
 import java.util.Collections;
