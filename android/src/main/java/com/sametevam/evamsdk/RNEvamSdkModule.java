@@ -1,106 +1,116 @@
 package com.sametevam.evamsdk;
 
 import com.evam.evamsdk.Evam;
+import com.evam.evamsdk.EvamInstance;
 import com.evam.evamsdk.EvamLogManager;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.UiThreadUtil;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class RNEvamSdkModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
 
   private static final String START = "start";
-  private static final String EVENT = "getEvent";
+  private static final String EVENT = "event";
 
   public RNEvamSdkModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
   }
 
+
   @ReactMethod
-    public String startEvam() {
-      Application application = (Application) reactContext.getApplicationContext();
-      Evam evamInstance = Evam.Companion.getInstance();
+  public void sendEvamEvent(final String eventName, final Promise promise) {
+      ConnectivityManager connectivityManager = (ConnectivityManager)reactContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+      boolean isConnected = networkInfo != null && networkInfo.isConnected(); // Whether to network
+      boolean isConnectWifi = networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI; // Whether to connect WiFi
+      boolean isConnectedMobile = networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_MOBILE;; // Whether to connect to a mobile cellular network
 
-        evamInstance.initialize(
-                application,
-              "https://test.em.api-evam.com/sdk-api/in-app-communication-wrapper",
-                "https://test.em.api-evam.com/sdk-listener/event",
-                "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJldmFtIiwiZG9tYWluIjoiZXZhbS5jb20iLCJpYXQiOjE2MTQyODYyODZ9.sfhJmjaYjeVMFSdR7nJxg1SndWHqdJY0HgdICmnpBgg",
-                "evam.com",
-                "evam",
-                "evam.com",
-                false
-        );
+      HashMap<String, String> eventParameters = new HashMap<>();
+      eventParameters.put("key11", UUID.randomUUID().toString());
+      Application currentActivity = (Application) reactContext.getApplicationContext();
+      //Activity currentActivity = getCurrentActivity();
+      try{
+        UiThreadUtil.runOnUiThread(() -> {
+         EvamLogManager.Companion.getInstance(currentActivity)
+                .logEvent(getCurrentActivity(), eventName, eventParameters, appCommunicationItemAction -> { return null;});
+        });
 
-    System.out.println("getEvamFunc");
+      //  UiThreadUtil.runOnUiThread(() -> {
+      //    EvamLogManager.Companion.getInstance(currentActivity)
+      //            .logEvent(currentActivity, "e1", action -> {
+       //             return null;
+       //           });
+       // });
 
-    evamInstance.updateActorId(reactContext, "samet");
-    
-    return Boolean.toString(evamInstance.isInitialized());
+        promise.resolve("Event has send");
+      }
+      catch(Exception e) {
+        promise.reject("No current activity.");
+        e.printStackTrace();
+      }
   }
 
   @ReactMethod
-  public String sendEvamEvent() {
+  public void changeActorId(final String actorId, final Promise promise) {
+      try{
+          Evam evamInstance = Evam.Companion.getInstance();
+          //UiThreadUtil.runOnUiThread(() -> {
+            // evamInstance.updateActorId(reactContext, "samet");
+              evamInstance.updateActorId(reactContext, actorId);
+            // });
+            promise.resolve("ActorId changed");
+      }
+      catch(Exception e) {
+         // promise.reject("Error");
+          e.printStackTrace();
+      }
+  }
 
-    System.out.println("çalıştı mı");
-    HashMap<String, String> eventParameters = new HashMap<>();
-    eventParameters.put("key1", "cem");
-    eventParameters.put("key2", "samet");
-    try{
-      EvamLogManager.Companion.getInstance(reactContext)
-              .logEvent(reactContext, "event_name", eventParameters);
-    }
-    catch(Exception e) {
-      e.printStackTrace();
-    }
 
-    return "success";
+
+  @ReactMethod
+  public void sendNavigationLog(final String page, final Promise promise) {
+      Application currentActivity = (Application) reactContext.getApplicationContext();
+      HashMap<String, String> eventParameters = new HashMap<>();
+      Context context = reactContext.getApplicationContext();
+      String sa  =  getCurrentActivity().getLocalClassName();
+      Log.e("app", "Activity nameE:" + sa);
+
+      try{
+          UiThreadUtil.runOnUiThread(() -> {
+              EvamLogManager.Companion.getInstance(currentActivity)
+                      .logEvent( getCurrentActivity(), page, eventParameters, appCommunicationItemAction -> { return null;});
+          });
+          promise.resolve("navigationLog is send");
+      }
+      catch(Exception e){
+          e.printStackTrace();
+      }
   }
 
   @Override
   public String getName() {
     return "RNEvamSdk";
-  }
-
-   @Override
-  public Map<String, Object> getConstants() {
-    final Map<String, Object> constants = new HashMap<>();
-    
-
-    // try {
-      //  com.evam.evamsdk.Evam evamInstance = com.evam.evamsdk.Evam.Companion.getInstance();
-      //   Application thisApplication = getApplication();
-      //   evamInstance.initialize(
-      //           thisApplication,
-      //         "https://test.em.api-evam.com/sdk-api/in-app-communication-wrapper",
-      //           "https://test.em.api-evam.com/sdk-listener/event",
-      //           "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJldmFtIiwiZG9tYWluIjoiZXZhbS5jb20iLCJpYXQiOjE2MTQyODYyODZ9.sfhJmjaYjeVMFSdR7nJxg1SndWHqdJY0HgdICmnpBgg",
-      //           "evam.com",
-      //           "evam",
-      //           "evam.com",
-      //           false
-      //   );
-        // evamInstance.setSplashActivity(MainActivity.class);
-
-        // constants.put(START, "May the force be with you");
-
-        constants.put(START, startEvam());
-        constants.put(EVENT, sendEvamEvent());
-    // } catch (NameNotFoundException e) {
-      // e.printStackTrace();
-      //  System.out.println("Message: " + e.getMessage());
-    // }
-    return constants;
   }
 
 }
